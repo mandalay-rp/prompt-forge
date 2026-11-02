@@ -3,7 +3,7 @@ requires = ["hatchling>=1.21"]
 build-backend = "hatchling.build"
 
 [project]
-name = "promptforge"
+name = "promptforge-llm"
 version = "1.0.0"
 description = "System prompt generator for LLM agents with JSON export for OpenAI and Anthropic APIs"
 readme = "README.md"

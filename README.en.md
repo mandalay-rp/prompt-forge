@@ -6,23 +6,23 @@
 </p>
 
 <p align="center">
-  <a href="https://pypi.org/project/promptforge/">
-    <img src="https://img.shields.io/pypi/v/promptforge?label=PyPI&color=blue" alt="PyPI version">
+  <a href="https://pypi.org/project/promptforge-llm/">
+    <img src="https://img.shields.io/pypi/v/promptforge-llm?label=PyPI&color=blue" alt="PyPI version">
   </a>
-  <a href="https://pypi.org/project/promptforge/">
-    <img src="https://img.shields.io/pypi/pyversions/promptforge?label=Python&color=3776AB" alt="Python versions">
+  <a href="https://pypi.org/project/promptforge-llm/">
+    <img src="https://img.shields.io/pypi/pyversions/promptforge-llm?label=Python&color=3776AB" alt="Python versions">
   </a>
   <a href="https://github.com/mandalay-rp/prompt-forge/actions/workflows/test.yml">
     <img src="https://img.shields.io/github/actions/workflow/status/mandalay-rp/prompt-forge/test.yml?label=Tests" alt="Tests">
   </a>
   <a href="https://github.com/mandalay-rp/prompt-forge/blob/main/LICENSE">
-    <img src="https://img.shields.io/pypi/l/promptforge?label=License&color=green" alt="License">
+    <img src="https://img.shields.io/pypi/l/promptforge-llm?label=License&color=green" alt="License">
   </a>
-  <a href="https://pypi.org/project/promptforge/">
-    <img src="https://img.shields.io/pypi/dm/promptforge?label=Downloads" alt="Downloads">
+  <a href="https://pypi.org/project/promptforge-llm/">
+    <img src="https://img.shields.io/pypi/dm/promptforge-llm?label=Downloads" alt="Downloads">
   </a>
   <a href="https://github.com/mandalay-rp/prompt-forge">
-    <img src="https://img.shields.io/badge/GitHub-promptforge-181717?logo=github" alt="GitHub">
+    <img src="https://img.shields.io/badge/GitHub-promptforge-llm-181717?logo=github" alt="GitHub">
   </a>
 </p>
 
@@ -48,12 +48,12 @@
 ## Installation
 
 ```bash
-pip install promptforge
+pip install promptforge-llm
 
 # With optional dependencies
-pip install promptforge[yaml]       # YAML config support
-pip install promptforge[tokens]     # accurate token estimation via tiktoken
-pip install promptforge[all]        # all optional dependencies
+pip install promptforge-llm[yaml]       # YAML config support
+pip install promptforge-llm[tokens]     # accurate token estimation via tiktoken
+pip install promptforge-llm[all]        # all optional dependencies
 ```
 
 ## Quick Start
