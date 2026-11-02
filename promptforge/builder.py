@@ -32,7 +32,7 @@ LANGUAGE_NAMES = {
 def estimate_tokens(text: str) -> int:
     """Точная оценка при установленном tiktoken, иначе эвристика."""
     try:  # pragma: no cover
-        import tiktoken  # type: ignore
+        import tiktoken
 
         return len(tiktoken.get_encoding("o200k_base").encode(text))
     except Exception:
