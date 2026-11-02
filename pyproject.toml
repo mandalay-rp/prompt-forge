@@ -1,0 +1,96 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "promptforge"
+version = "1.0.0"
+description = "System prompt generator for LLM agents with JSON export for OpenAI and Anthropic APIs"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Alex Jurow", email = "teletoo51@yahoo.com" }]
+maintainers = [{ name = "Alex Jurow", email = "teletoo51@yahoo.com" }]
+keywords = [
+    "llm",
+    "prompt",
+    "agent",
+    "openai",
+    "anthropic",
+    "system-prompt",
+    "function-calling",
+    "django",
+    "gpt",
+    "claude",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Text Processing :: Markup",
+    "Typing :: Typed",
+]
+dependencies = []
+
+[project.optional-dependencies]
+yaml = ["pyyaml>=6.0"]
+tokens = ["tiktoken>=0.5.0"]
+all = ["pyyaml>=6.0", "tiktoken>=0.5.0"]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.3.0",
+    "mypy>=1.8.0",
+    "pyyaml>=6.0",
+    "tiktoken>=0.5.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/mandalay-rp/prompt-forge"
+Repository = "https://github.com/mandalay-rp/prompt-forge"
+Documentation = "https://github.com/mandalay-rp/prompt-forge#promptforge"
+"Bug Tracker" = "https://github.com/mandalay-rp/prompt-forge/issues"
+Changelog = "https://github.com/mandalay-rp/prompt-forge/blob/main/CHANGELOG.md"
+
+[project.scripts]
+promptforge = "promptforge.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["promptforge"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/promptforge",
+    "/README.md",
+    "/README.en.md",
+    "/LICENSE",
+    "/CHANGELOG.md",
+]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --cov=promptforge --cov-report=term-missing"
