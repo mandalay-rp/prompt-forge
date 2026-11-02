@@ -11,15 +11,25 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shlex
+import subprocess
 import sys
 import tempfile
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 from .builder import PromptBuilder
 from .exporters import FORMATS, export
 from .models import AgentConfig, ConfigError
 from .sample import SAMPLE_CONFIG
+
+RESET = "\033[0m"
+BOLD = "\033[1m"
+DIM = "\033[2m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+CYAN = "\033[36m"
 
 
 def _parse_vars(items: Sequence[str]) -> dict[str, str]:
@@ -66,7 +76,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_init.add_argument(
         "--non-interactive",
         action="store_true",
-        help="силой отключить интерактивный режим (аналог --template)",
+        help="принудительно отключить интерактивный режим (аналог --template)",
     )
     p_init.add_argument(
         "--force", action="store_true", help="перезаписать существующий файл"
@@ -101,74 +111,110 @@ def _build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _confirm_preview(data: dict[str, Any], indent: int) -> bool:
-    print("\n\033[1m=== Предпросмотр конфигурации ===\033[0m")
-    print(json.dumps(data, ensure_ascii=False, indent=indent))
-    print(
-        "\033[1m\033[36m?\033[0m \033[1mСохранить этот конфиг?\033[0m \033[2m[Y/n/edit]\033[0m"
-    )
+def _edit_in_editor(data: dict[str, Any]) -> dict[str, Any] | None:
+    """Открыть JSON в $EDITOR и вернуть отредактированный конфиг (или None при ошибке)."""
+    editor = os.environ.get("EDITOR") or os.environ.get("VISUAL") or "nano"
+    fd, tmp = tempfile.mkstemp(suffix=".json")
+    tmp_path = Path(tmp)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            fh.write(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
+
+        cmd = [*shlex.split(editor), str(tmp_path)]
+        try:
+            completed = subprocess.run(cmd, check=False)
+        except (OSError, ValueError) as exc:
+            print(f"{YELLOW}  ⚠ не удалось запустить редактор '{editor}': {exc}{RESET}")
+            return None
+        if completed.returncode != 0:
+            print(
+                f"{YELLOW}  ⚠ редактор завершился с кодом {completed.returncode}{RESET}"
+            )
+            return None
+
+        loaded: Any = json.loads(tmp_path.read_text(encoding="utf-8"))
+        if not isinstance(loaded, dict):
+            print(f"{YELLOW}  ⚠ ожидался JSON-объект верхнего уровня{RESET}")
+            return None
+
+        edited: dict[str, Any] = loaded
+        try:
+            AgentConfig.from_dict(edited).ensure_valid()
+        except ConfigError as exc:
+            print(f"{YELLOW}  ⚠ {exc}{RESET}")
+            return None
+        return edited
+
+    except (json.JSONDecodeError, OSError) as exc:
+        print(f"{YELLOW}  ⚠ ошибка редактирования: {exc}{RESET}")
+        return None
+    finally:
+        tmp_path.unlink(missing_ok=True)
+
+
+def _confirm_preview(data: dict[str, Any], indent: int) -> dict[str, Any] | None:
+    """Показать конфиг и спросить подтверждение. None — отказ от сохранения."""
+    current = data
     while True:
+        print(f"\n{BOLD}=== Предпросмотр конфигурации ==={RESET}")
+        print(json.dumps(current, ensure_ascii=False, indent=indent))
+        print(
+            f"{BOLD}{CYAN}?{RESET} {BOLD}Сохранить этот конфиг?{RESET} "
+            f"{DIM}[Y/n/edit]{RESET}"
+        )
         try:
             choice = input("> ").strip().lower()
         except (EOFError, KeyboardInterrupt):
             print()
-            return False
+            return None
+
         if choice in {"", "y", "yes", "да", "д"}:
-            return True
+            return current
         if choice in {"n", "no", "нет", "н"}:
-            return False
+            return None
         if choice in {"edit", "e", "редактировать"}:
-            return _edit_in_editor(data) is not None
-        print("\033[33m  ⚠ введите y, n или edit\033[0m")
+            edited = _edit_in_editor(current)
+            if edited is not None:
+                current = edited
+                print(f"{GREEN}  ✓ изменения применены{RESET}")
+            continue
+        print(f"{YELLOW}  ⚠ введите y, n или edit{RESET}")
 
 
-def _edit_in_editor(data: dict[str, Any]) -> dict[str, Any] | None:
-    editor = os.environ.get("EDITOR", "nano")
-    fd, tmp = tempfile.mkstemp(suffix=".json")
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8") as fh:
-            fh.write(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
-        os.system(f"{editor} {tmp}")
-        with open(tmp, encoding="utf-8") as fh:
-            return json.load(fh)
-    except (json.JSONDecodeError, OSError) as exc:
-        print(f"\033[33m  ⚠ ошибка редактирования: {exc}\033[0m")
-        return None
-    finally:
-        Path(tmp).unlink(missing_ok=True)
+def _run_init(args: argparse.Namespace) -> int:
+    out: Path = args.out
+    if out.exists() and not args.force:
+        raise ConfigError(f"Файл {out} уже существует. Используйте --force.")
+
+    use_template = args.template or args.non_interactive or not sys.stdin.isatty()
+
+    if use_template:
+        config_data: dict[str, Any] = dict(SAMPLE_CONFIG)
+    else:
+        from .interactive import AbortError, run_wizard
+
+        try:
+            config_data = run_wizard()
+        except AbortError:
+            return 130
+
+        if not args.no_preview:
+            confirmed = _confirm_preview(config_data, args.indent)
+            if confirmed is None:
+                print(f"{YELLOW}Отменено пользователем.{RESET}")
+                return 1
+            config_data = confirmed
+
+    _write_json(out, config_data, args.indent)
+    print(f"{GREEN}Конфигурация создана: {out}{RESET}")
+    return 0
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
     try:
         if args.command == "init":
-            if args.out.exists() and not args.force:
-                raise ConfigError(
-                    f"Файл {args.out} уже существует. Используйте --force."
-                )
-
-            use_template = (
-                args.template or args.non_interactive or not sys.stdin.isatty()
-            )
-
-            if use_template:
-                config_data = SAMPLE_CONFIG
-            else:
-                from .interactive import AbortError, run_wizard
-
-                try:
-                    config_data = run_wizard()
-                except AbortError:
-                    return 130
-
-                if not args.no_preview:
-                    if not _confirm_preview(config_data, args.indent):
-                        print("\033[33mОтменено пользователем.\033[0m")
-                        return 1
-
-            _write_json(args.out, config_data, args.indent)
-            print(f"\033[32mКонфигурация создана: {args.out}\033[0m")
-            return 0
+            return _run_init(args)
 
         config = AgentConfig.from_file(args.config)
         builder = PromptBuilder(config, variables=_parse_vars(args.var))

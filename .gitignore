@@ -1,6 +1,7 @@
 # Misc
 .mypy_cache/
 *.json
+.coverage
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

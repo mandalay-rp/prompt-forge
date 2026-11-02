@@ -55,7 +55,7 @@ class Tool:
     strict: bool = False
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "Tool":
+    def from_dict(cls, data: dict[str, Any]) -> Tool:
         return cls(**_filter_kwargs(cls, data))
 
     def to_openai(self) -> dict[str, Any]:
@@ -84,7 +84,7 @@ class Example:
     assistant: str
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "Example":
+    def from_dict(cls, data: dict[str, Any]) -> Example:
         return cls(**_filter_kwargs(cls, data))
 
 
@@ -98,7 +98,7 @@ class OutputSpec:
     schema_name: str = "agent_response"
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "OutputSpec":
+    def from_dict(cls, data: dict[str, Any]) -> OutputSpec:
         return cls(**_filter_kwargs(cls, data))
 
 
@@ -142,7 +142,7 @@ class AgentConfig:
     metadata: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "AgentConfig":
+    def from_dict(cls, data: dict[str, Any]) -> AgentConfig:
         kwargs = _filter_kwargs(cls, data)
         kwargs["tools"] = [
             t if isinstance(t, Tool) else Tool.from_dict(t)
@@ -158,12 +158,12 @@ class AgentConfig:
         return cls(**kwargs)
 
     @classmethod
-    def from_file(cls, path: str | Path) -> "AgentConfig":
+    def from_file(cls, path: str | Path) -> AgentConfig:
         path = Path(path)
         raw = path.read_text(encoding="utf-8")
         if path.suffix.lower() in {".yaml", ".yml"}:
             try:
-                import yaml  # type: ignore
+                import yaml
             except ImportError as exc:  # pragma: no cover
                 raise ConfigError(
                     "Для YAML установите PyYAML: pip install pyyaml"

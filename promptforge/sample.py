@@ -61,7 +61,10 @@ SAMPLE_CONFIG: dict[str, Any] = {
                 "properties": {
                     "path": {
                         "type": "string",
-                        "description": "Путь относительно корня репозитория, например apps/orders/views.py",
+                        "description": (
+                            "Путь относительно корня репозитория, "
+                            "например apps/orders/views.py"
+                        ),
                     }
                 },
                 "required": ["path"],
@@ -97,7 +100,8 @@ SAMPLE_CONFIG: dict[str, Any] = {
         {
             "user": "Проверь: for order in Order.objects.all(): print(order.user.email)",
             "assistant": (
-                "**major — N+1 запрос.** На каждой итерации выполняется отдельный SELECT в auth_user.\n\n"
+                "**major — N+1 запрос.** На каждой итерации выполняется отдельный "
+                "SELECT в auth_user.\n\n"
                 "```python\n"
                 "for order in Order.objects.select_related('user').only('id', 'user__email'):\n"
                 "    print(order.user.email)\n"
