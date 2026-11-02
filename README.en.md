@@ -21,9 +21,6 @@
   <a href="https://pypi.org/project/promptforge-llm/">
     <img src="https://img.shields.io/pypi/dm/promptforge-llm?label=Downloads" alt="Downloads">
   </a>
-  <a href="https://github.com/mandalay-rp/prompt-forge">
-    <img src="https://img.shields.io/badge/GitHub-promptforge-llm-181717?logo=github" alt="GitHub">
-  </a>
 </p>
 
 <p align="center">
@@ -107,7 +104,7 @@ If you use PromptForge in academic work or a project, we'd appreciate a citation
   title = {PromptForge: System Prompt Generator for LLM Agents},
   year = {2026},
   publisher = {PyPI},
-  url = {https://pypi.org/project/promptforge/},
+  url = {https://pypi.org/project/promptforge-llm/},
   version = {1.0.0}
 }
 ```
