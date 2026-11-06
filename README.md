@@ -1,7 +1,7 @@
 <p align="center">
   <h1 align="center">PromptForge</h1>
   <p align="center">
-    <em>Генератор system-промтов для LLM-агентов с экспортом в JSON для API</em>
+    <em>CLI-утилита для генерации system-промтов для LLM-агентов с экспортом в JSON для API</em>
   </p>
 </p>
 
@@ -29,7 +29,7 @@
 
 ---
 
-**PromptForge** — инструмент для создания, валидации и экспорта system-промтов LLM-агентов в готовые JSON-payload для API (OpenAI, Anthropic, универсальный формат).
+**PromptForge** — CLI-инструмент для создания, валидации и экспорта system-промтов LLM-агентов в готовые JSON-payload для API (OpenAI, Anthropic, универсальный формат).
 
 ### Ключевые возможности
 
