@@ -1,7 +1,7 @@
 <p align="center">
   <h1 align="center">PromptForge</h1>
   <p align="center">
-    <em>System prompt generator for LLM agents with JSON export for APIs</em>
+    <em>CLI System prompt generator for LLM agents with JSON export for APIs</em>
   </p>
 </p>
 
@@ -29,7 +29,7 @@
 
 ---
 
-**PromptForge** is a tool for creating, validating, and exporting system prompts for LLM agents into ready-to-use JSON payloads for APIs (OpenAI, Anthropic, universal format).
+**PromptForge** is a CLI tool for creating, validating, and exporting system prompts for LLM agents into ready-to-use JSON payloads for APIs (OpenAI, Anthropic, universal format).
 
 ### Key Features
 
